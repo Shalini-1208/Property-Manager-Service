@@ -146,7 +146,7 @@ class ApplicationControllerTest {
     void testDeleteApplicationById_Success() {
         
         Long id = 1L;
-        applicationController.delteApplicationById(id);
+        applicationController.deleteApplicationById(id);
         verify(applicationService, times(1)).removeApplicationByID(id);
     }
     @Test
@@ -154,7 +154,7 @@ class ApplicationControllerTest {
 
         Long invalidId = 100L;
         doThrow(new RuntimeException("Application not exist")).when(applicationService).removeApplicationByID(invalidId);
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> applicationController.delteApplicationById(invalidId));
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> applicationController.deleteApplicationById(invalidId));
         assertEquals("Application not exist", exception.getMessage());
         verify(applicationService, times(1)).removeApplicationByID(invalidId);
     }
@@ -162,7 +162,7 @@ class ApplicationControllerTest {
     void testDeleteApplicationByName_Success() {
        
         String name = "shalini";
-        applicationController.delteApplicationByName(name);
+        applicationController.deleteApplicationByName(name);
         verify(applicationService, times(1)).removeApplicationByName(name);
     }
     @Test
@@ -170,7 +170,7 @@ class ApplicationControllerTest {
         
         String invalidName = "nonExistingName";
         doThrow(new RuntimeException("Application not exist")).when(applicationService).removeApplicationByName(invalidName);
-       assertThrows(RuntimeException.class, () -> applicationController.delteApplicationByName(invalidName));
+       assertThrows(RuntimeException.class, () -> applicationController.deleteApplicationByName(invalidName));
         verify(applicationService, times(1)).removeApplicationByName(invalidName);
     }
 }

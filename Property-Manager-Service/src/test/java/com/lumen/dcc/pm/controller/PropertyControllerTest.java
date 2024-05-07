@@ -339,7 +339,7 @@ class PropertyControllerTest {
         String name = "n1";
         String engine = "e1";
         String environment = "dev";
-        propertyController.deltePropertyByNameAndEngineAndEnvironment(name, engine, environment);
+        propertyController.deletePropertyByNameAndEngineAndEnvironment(name, engine, environment);
         verify(propertyService, times(1)).deleteAllByPropertyNameAndEngineAndEnvironment(name, engine, environment);
     }
     

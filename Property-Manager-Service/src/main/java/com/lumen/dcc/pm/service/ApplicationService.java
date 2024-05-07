@@ -3,6 +3,9 @@ package com.lumen.dcc.pm.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 import com.lumen.dcc.pm.dto.ApplicationDTO;
@@ -21,6 +24,7 @@ public class ApplicationService {
 	private ApplicationTransformer transformer;
 	
 	@Transactional
+	@CachePut(value = "application", key = "#result.id")
 	public ApplicationDTO createApplication(ApplicationDTO app)
 	{
 		if(repository.existsById(app.getApplicationId()))
@@ -30,6 +34,7 @@ public class ApplicationService {
 		return transformer.transformToDto(repository.save(transformer.transformToEntity(app)));
 	}
 	@Transactional
+	@Cacheable(value = "application", key = "#id")
 	public ApplicationDTO getApplicationByID(Long id)
 	{
 		if(repository.findById(id)==null)
@@ -37,9 +42,9 @@ public class ApplicationService {
 			throw new RuntimeException("Application not exist");
 		}
 		return transformer.transformToDto(repository.getById(id));
-	
 	}
 	@Transactional
+	@CacheEvict(value = {"applications"}, key = "#id")
 	public void removeApplicationByID(Long id)
 	{
 		if(repository.findById(id)==null)
@@ -50,6 +55,7 @@ public class ApplicationService {
 		repository.deleteById(id);
 	}
 	@Transactional
+    @Cacheable(value = "applications", key = "#name")
 	public List<ApplicationDTO> getApplicationByName(String name)
 	{
 	
@@ -61,6 +67,7 @@ public class ApplicationService {
 		
 	}
 	@Transactional
+	@CacheEvict(value = {"applications"}, key = "#name")
 	public void removeApplicationByName(String name)
 	{
 		if(repository.getByName(name).isEmpty())
@@ -70,6 +77,7 @@ public class ApplicationService {
 		repository.deleteByName(name);
 	}
 	@Transactional
+	@Cacheable(value = "applications")
 	public List<ApplicationDTO> getAll()
 	{
 		if(repository.findAll().isEmpty())
@@ -80,6 +88,7 @@ public class ApplicationService {
 		return transformer.transformToDto(repository.findAll());
 	}
 	@Transactional
+	@CachePut(value = "application", key = "#id")
 	public ApplicationDTO UpdateApplication(Long id,ApplicationDTO apps)
 	{
 		if(repository.findById(id)==null)
@@ -91,3 +100,4 @@ public class ApplicationService {
 	
 	
 }
+

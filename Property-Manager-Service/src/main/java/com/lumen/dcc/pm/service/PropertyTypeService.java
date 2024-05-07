@@ -3,6 +3,9 @@ package com.lumen.dcc.pm.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 import com.lumen.dcc.pm.dto.PropertyTypeDTO;
@@ -11,7 +14,9 @@ import com.lumen.dcc.pm.transformer.PropertyTypeTransformer;
 
 import jakarta.transaction.Transactional;
 
+
 @Component
+@Cacheable("PropertyTypes")
 public class PropertyTypeService {
 	
 	@Autowired
@@ -21,6 +26,7 @@ public class PropertyTypeService {
 	private PropertyTypeTransformer transformer;
 	
 	@Transactional
+	@CachePut(value = "propertyType", key = "#result.id")
 	public PropertyTypeDTO createPropertyType(PropertyTypeDTO app)
 	{
 		if(repository.existsById(app.getPropertyTypeId()))
@@ -30,6 +36,7 @@ public class PropertyTypeService {
 		return transformer.transformToDto(repository.save(transformer.transformToEntity(app)));
 	}
 	@Transactional
+	@Cacheable(value = "propertyType", key = "#id")
 	public PropertyTypeDTO getPropertyTypeByID(Long id)
 	{
 		if(repository.findById(id)==null)
@@ -40,6 +47,7 @@ public class PropertyTypeService {
 	}
 	
 	@Transactional
+	@Cacheable(value = "propertyType")
 	public List<PropertyTypeDTO> getAll()
 	{
 		if(repository.findAll().isEmpty())
@@ -50,6 +58,7 @@ public class PropertyTypeService {
 	}
 	
 	@Transactional
+	@CachePut(value = "propertyType", key = "#result.id")
 	public PropertyTypeDTO UpdatePropertyType(Long id,PropertyTypeDTO apps)
 	{
 		if(repository.findById(id)==null)
@@ -59,6 +68,7 @@ public class PropertyTypeService {
 		return transformer.transformToDto(repository.save(transformer.transformToEntity(apps)));
 	}
 	@Transactional
+	@CacheEvict(value = {"propertyTypes"}, key = "#id")
 	public void removePropertyTypeByID(Long id)
 	{
 		if(repository.findById(id)==null)
@@ -68,6 +78,7 @@ public class PropertyTypeService {
 		repository.deleteById(id);
 	}
 	@Transactional
+	@Cacheable(value = "propertyType",key="#name")
 	public List<PropertyTypeDTO> getPropertyTypeByName(String name)
 	{
 		if(repository.getByName(name)==null)
@@ -77,6 +88,7 @@ public class PropertyTypeService {
 		return transformer.transformToDto(repository.getByName(name));
 	}
 	@Transactional
+	@Cacheable(value = "propertyTypes", key = "#id.concat('-').concat(#name)")
 	public PropertyTypeDTO getByPropertyTypeIdAndName(Long id,String name)
 	{
 		if(repository.getByPropertyTypeIdAndName(id, name)==null)
@@ -88,3 +100,4 @@ public class PropertyTypeService {
 	}
 
 }
+
