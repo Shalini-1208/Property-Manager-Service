@@ -15,7 +15,6 @@ import com.lumen.dcc.pm.transformer.PropertyTransformer;
 import jakarta.transaction.Transactional;
 
 @Component
-@Cacheable("Properties")
 public class PropertyService {
 
 	@Autowired
@@ -24,7 +23,6 @@ public class PropertyService {
 	@Autowired
 	private PropertyTransformer transformer;
 	
-
 	@Transactional
 	@CachePut(value = "property", key = "#result.id")
 	public PropertyDTO createProperty(PropertyDTO app)

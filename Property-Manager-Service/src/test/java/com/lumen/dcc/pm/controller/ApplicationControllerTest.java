@@ -2,6 +2,7 @@ package com.lumen.dcc.pm.controller;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -16,8 +17,13 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.lumen.dcc.pm.dto.ApplicationDTO;
 import com.lumen.dcc.pm.service.ApplicationService;
@@ -25,17 +31,18 @@ import com.lumen.dcc.pm.service.ApplicationService;
 @SpringBootTest
 class ApplicationControllerTest {
 
-   
     
     @InjectMocks
     private ApplicationController applicationController;
-
+    
     @Mock
     private ApplicationService applicationService;
+   
+    @Autowired
+    private CacheManager cacheManager;
     
     @Test
     void testCreateApplication_Success() {
-       
     	ApplicationDTO applicationDTO = new ApplicationDTO(1,"shalini","it is name");
         when(applicationService.createApplication(applicationDTO)).thenReturn(applicationDTO);
         ResponseEntity<ApplicationDTO> result = applicationController.createApplication(applicationDTO);
@@ -46,7 +53,6 @@ class ApplicationControllerTest {
     
     @Test
     void testCreateApplication_InvalidName() {
-      
         ApplicationDTO appDTO = new ApplicationDTO(1L,"","it is name");
         when(applicationController.createApplication(appDTO)).thenThrow(new RuntimeException("Application name is required"));
         verify(applicationService, never()).createApplication(appDTO);
@@ -60,7 +66,6 @@ class ApplicationControllerTest {
     }
     @Test
     void testCreateApplication_DuplicateId() {
-      
         ApplicationDTO appDTO = new ApplicationDTO(1L,"shalini","it is name");
         when(applicationService.createApplication(appDTO)).thenThrow(new RuntimeException("Application already exist"));
         RuntimeException exception = assertThrows(RuntimeException.class, () -> applicationController.createApplication(appDTO));
@@ -69,7 +74,6 @@ class ApplicationControllerTest {
     }
     @Test
     void testUpdateApplication_Success() {
-  
         Long id = 1L;
         ApplicationDTO applicationDTO = new ApplicationDTO(1,"shalini","it is name");
         when(applicationService.UpdateApplication(id,  applicationDTO)).thenReturn(applicationDTO);
@@ -90,8 +94,7 @@ class ApplicationControllerTest {
         verify(applicationService, times(1)).getApplicationByID(id);
     }
     @Test
-    void testGetApplicationById_Failure() {
-       
+    void testGetApplicationById_Failure() {    
         Long invalidId = 100L;
         when(applicationService.getApplicationByID(invalidId)).thenThrow(new RuntimeException("Application not exist"));
         RuntimeException exception = assertThrows(RuntimeException.class, () -> applicationController.getApplicationById(invalidId));
@@ -128,7 +131,6 @@ class ApplicationControllerTest {
         appDTOList.add(appDTO1);
         appDTOList.add(appDTO2);
         String name = "shalini";
-
         when(applicationService.getApplicationByName(name)).thenReturn(appDTOList);
         ResponseEntity<List<ApplicationDTO>> result = applicationController.getApplicationByName(name);
         verify(applicationService, times(1)).getApplicationByName(name);
@@ -144,14 +146,12 @@ class ApplicationControllerTest {
     }
     @Test
     void testDeleteApplicationById_Success() {
-        
         Long id = 1L;
         applicationController.deleteApplicationById(id);
         verify(applicationService, times(1)).removeApplicationByID(id);
     }
     @Test
     void testDeleteApplicationById_InvalidId() {
-
         Long invalidId = 100L;
         doThrow(new RuntimeException("Application not exist")).when(applicationService).removeApplicationByID(invalidId);
         RuntimeException exception = assertThrows(RuntimeException.class, () -> applicationController.deleteApplicationById(invalidId));
@@ -160,17 +160,15 @@ class ApplicationControllerTest {
     }
     @Test
     void testDeleteApplicationByName_Success() {
-       
         String name = "shalini";
         applicationController.deleteApplicationByName(name);
         verify(applicationService, times(1)).removeApplicationByName(name);
     }
     @Test
     void testDeleteApplicationByName_InvalidName() {
-        
         String invalidName = "nonExistingName";
         doThrow(new RuntimeException("Application not exist")).when(applicationService).removeApplicationByName(invalidName);
-       assertThrows(RuntimeException.class, () -> applicationController.deleteApplicationByName(invalidName));
+        assertThrows(RuntimeException.class, () -> applicationController.deleteApplicationByName(invalidName));
         verify(applicationService, times(1)).removeApplicationByName(invalidName);
     }
 }
