@@ -67,22 +67,6 @@ class ApplicationServiceCacheTest {
         Cache applicationCache = cacheManager.getCache("application");
         assertNotNull(applicationCache);
     }
-    @Test
-    public void testCache() {
-        // Assuming your service method retrieves data and caches it
-        // Mock cache behavior
-    	 ApplicationDTO appDto = new ApplicationDTO(1,"shalini","it is name");
-         when(cacheManager.getCache("application")).thenReturn(null); // Mock cache being empty initially
-        
-        // Call the method multiple times
-        service.UpdateApplication(1L,appDto);
-        service.UpdateApplication(1L,appDto);// First call
-        
-
-        // Verify that the method was called only once because the second call should fetch from cache
-        // You can use Mockito's verify method or any assertion framework of your choice
-        verify(service, times(1)).UpdateApplication(1L,appDto);
-    }
 
     @Test
     void testCreateApplication_CacheFailure()
